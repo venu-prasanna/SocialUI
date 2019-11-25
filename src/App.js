@@ -2,6 +2,8 @@ import React,{Component} from 'react';
 import {View,Text,StyleSheet,Dimensions,Animated,TouchableOpacity,Image,PanResponder} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+import ChatComponent from './components/ChatComponent';
+
 const SCREEN_HIGHT = Dimensions.get('window').height;
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
@@ -21,7 +23,8 @@ class App extends Component{
         
         this.position = new Animated.ValueXY();
         this.state = {
-            currentIndex:0
+            currentIndex:0,
+            view:'Home'
         }
         this.rotate = this.position.x.interpolate({
             inputRange:[-SCREEN_WIDTH/2,0,SCREEN_HIGHT/2],
@@ -60,6 +63,14 @@ class App extends Component{
             outputRange:[1,0.8,1],
             extrapolate:'clamp'
         })
+        
+        this.onChangeView = this.onChangeView.bind(this);
+    }
+
+    onChangeView(viewName){
+        if(this.state.view !== viewName){
+            this.setState({view:viewName});
+        }
     }
 
     componentWillMount(){
@@ -147,27 +158,39 @@ class App extends Component{
     }
 
     render(){
-        return(
-            <View style={styles.container}>
-                <View style={{flex:1}}>
-                    {this.renderUsers()}
+        if(this.state.view === 'Home'){
+            return(
+                <View style={styles.container}>
+                    <View style={{flex:1}}>
+                        {this.renderUsers()}
+                    </View>
+                    <View style={styles.navBarStyle}>
+                        <TouchableOpacity onPress={()=>alert('clicked likes')}>
+                            <Icon name="heart" size={40} color={'#e85e56'}/>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={()=>this.onChangeView('Chat')}>
+                            <Icon name="comment-o" size={40} color={'#6689d4'}/>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={()=>this.setState({view:'Home'})}>
+                            <Icon name="home" size={50} color={'grey'}/>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={()=>this.setState({currentIndex:0})}>
+                            <Icon name="repeat" size={40} color={'#d46c66'}/>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={()=>alert('settings')}>
+                            <Icon name="gear" size={40} color={'grey'}/>
+                        </TouchableOpacity>
+                    </View>
                 </View>
-                <View style={styles.navBarStyle}>
-                    <TouchableOpacity onPress={()=>alert('clicked likes')}>
-                        <Icon name="heart" size={40} color={'#e85e56'}/>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={()=>alert('show chat')}>
-                        <Icon name="comment-o" size={40} color={'#6689d4'}/>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={()=>this.setState({currentIndex:0})}>
-                        <Icon name="repeat" size={40} color={'#d46c66'}/>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={()=>alert('settings')}>
-                        <Icon name="gear" size={40} color={'grey'}/>
-                    </TouchableOpacity>
+            );
+        }
+        else if(this.state.view === 'Chat'){
+            return(
+                <View style={styles.container}>
+                    <ChatComponent onChangeView={()=>this.onChangeView('Home')} />
                 </View>
-            </View>
-        );
+            )
+        }
     }
 }
 
